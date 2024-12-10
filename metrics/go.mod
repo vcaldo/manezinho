@@ -4,7 +4,7 @@ go 1.23.4
 
 require (
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/vcaldo/manezinho/bot v0.0.0-20241210222653-b0073fd4e741
+	github.com/vcaldo/manezinho/bot v0.0.0-20241210234317-1057e95ca491
 )
 
 require (
