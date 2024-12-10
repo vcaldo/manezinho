@@ -59,6 +59,12 @@ services:
     volumes:
       - redis-data:/data
     restart: unless-stopped
+  metrics:
+    image: metrics:latest
+    container_name: metrics
+    build:
+      context: metrics/
+      dockerfile: Dockerfile
 volumes:
   redis-data:
   telegram-bot-api-server-storage:
