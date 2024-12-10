@@ -2,6 +2,7 @@ package transmission
 
 import (
 	"context"
+	"os"
 	"time"
 
 	"github.com/hekmon/transmissionrpc"
@@ -19,6 +20,13 @@ func NewClient(ctx context.Context, address, username, password string) (*Client
 		return nil, err
 	}
 	return &Client{client: client}, nil
+}
+
+func NewTransmissionClient(ctx context.Context) (*Client, error) {
+	url := os.Getenv("TRANSMISSION_URL")
+	user := os.Getenv("TRANSMISSION_USER")
+	pass := os.Getenv("TRANSMISSION_PASS")
+	return NewClient(ctx, url, user, pass)
 }
 
 func (c *Client) AddTorrent(ctx context.Context, torrentURL string) (*transmissionrpc.Torrent, error) {

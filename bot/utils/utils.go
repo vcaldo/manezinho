@@ -12,15 +12,8 @@ import (
 	"github.com/vcaldo/manezinho/bot/transmission"
 )
 
-func newTransmissionClient(ctx context.Context) (*transmission.Client, error) {
-	url := os.Getenv("TRANSMISSION_URL")
-	user := os.Getenv("TRANSMISSION_USER")
-	pass := os.Getenv("TRANSMISSION_PASS")
-	return transmission.NewClient(ctx, url, user, pass)
-}
-
 func AddTorrentFromFile(ctx context.Context, b *bot.Bot, fileID string, fileName string) (*transmissionrpc.Torrent, error) {
-	c, err := newTransmissionClient(ctx)
+	c, err := transmission.NewTransmissionClient(ctx)
 	if err != nil {
 		log.Printf("failed to create transmission client: %v", err)
 		return nil, err
@@ -42,7 +35,7 @@ func AddTorrentFromFile(ctx context.Context, b *bot.Bot, fileID string, fileName
 }
 
 func AddTorrentFromMagnet(ctx context.Context, msg string) (*transmissionrpc.Torrent, error) {
-	c, err := newTransmissionClient(ctx)
+	c, err := transmission.NewTransmissionClient(ctx)
 	if err != nil {
 		log.Printf("failed to create transmission client: %v", err)
 		return nil, err
