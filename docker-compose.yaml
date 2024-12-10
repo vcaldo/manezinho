@@ -65,6 +65,9 @@ services:
     build:
       context: metrics/
       dockerfile: Dockerfile
+    environment:
+      - REDIS_HOST=redis
+      - TRANSMISSION_URL=transmission
 volumes:
   redis-data:
   telegram-bot-api-server-storage:
