@@ -1,0 +1,67 @@
+---
+services:
+  telegram-bot-api-server:
+    image: vcaldo/telegram-bot-api:amd64
+    container_name: telegram-bot-api-server    
+    env_file:
+      - telegram-bot-api-server.env
+    ports:
+      - 8081:8081
+    volumes:
+      - telegram-bot-api-server-storage:/storage
+    restart: unless-stopped
+    entrypoint: [telegram-bot-api, "--local", "--dir=/storage","--verbosity=1"]
+  transmission:
+    image: lscr.io/linuxserver/transmission:4.0.6
+    container_name: transmission
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - TRANSMISSION_WEB_HOME= #optional
+      - USER= #optional
+      - PASS= #optional
+      - WHITELIST= #optional
+      - PEERPORT= #optional
+      - HOST_WHITELIST= #optional
+    ports:
+      - 9091:9091
+      - 51413:51413
+      - 51413:51413/udp
+    volumes:
+      - transmission-config:/config
+      - transmission-downloads:/downloads
+      - transmission-watch:/watch
+    restart: unless-stopped
+  bot:
+    image: manezinho-bot:latest
+    container_name: manezinho-bot
+    build:
+      context: bot/
+      dockerfile: Dockerfile
+    environment:
+      - LOCAL_TELEGRAM_BOT_API_URL=http://telegram-bot-api-server:8081
+      - TRANSMISSION_URL=transmission
+    env_file:
+      - bot.env
+    volumes:
+      - transmission-downloads:/downloads
+      - telegram-bot-api-server-storage:/storage
+    depends_on:
+      - telegram-bot-api-server
+      - transmission
+    restart: unless-stopped
+  redis:
+    image: redis:7.4.1
+    container_name: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+volumes:
+  redis-data:
+  telegram-bot-api-server-storage:
+  transmission-config:
+  transmission-downloads:
+  transmission-watch:
