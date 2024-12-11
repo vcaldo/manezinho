@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 )
 
-func CompressDownload(ctx context.Context, source, destination string) error {
+func CompressAndSplitDownload(ctx context.Context, source, destination string) error {
 	// Ensure destination directory exists
 	if err := os.MkdirAll(filepath.Dir(destination), 0755); err != nil {
 		return err

@@ -40,18 +40,19 @@ func main() {
 
 	completed := make(chan utils.Download)
 	compress := make(chan utils.Download)
+	upload := make(chan utils.Download)
 
 	var wg sync.WaitGroup
 
-	// Start the compression worker
+	// Start the compression worker and upload workers
 	wg.Add(1)
-	go utils.CompressionWorker(ctx, compress, &wg)
+	go utils.CompressionWorker(ctx, compress, upload, &wg)
+	go utils.UploadWorker(ctx, b, upload, &wg)
 
 	// Start monitoring downloads
 	go utils.MonitorDownloads(ctx, completed)
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
-
 	go func() {
 		for {
 			select {
@@ -70,7 +71,6 @@ func main() {
 
 	close(compress)
 	wg.Wait()
-
 }
 
 func handler(ctx context.Context, b *bot.Bot, update *models.Update) {
