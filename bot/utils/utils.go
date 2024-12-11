@@ -70,7 +70,7 @@ func IsUserAllowed(ctx context.Context, userId int64) bool {
 			return true
 		}
 	}
-	log.Printf("user %v is allowed to use the bot", userId)
+	log.Printf("user %v isn't allowed to use the bot", userId)
 
 	return false
 }
