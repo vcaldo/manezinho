@@ -1,4 +1,4 @@
-package fileutils
+package utils
 
 import (
 	"context"
@@ -31,5 +31,12 @@ func CompressAndSplitDownload(ctx context.Context, source, destination string) e
 
 	fmt.Printf("Compression completed: %s\n", output)
 
+	return nil
+}
+
+func RemoveUploadedFiles(ctx context.Context, download Download) error {
+	if err := os.RemoveAll(download.UploadPath); err != nil {
+		return fmt.Errorf("failed to remove uploaded files: %v", err)
+	}
 	return nil
 }

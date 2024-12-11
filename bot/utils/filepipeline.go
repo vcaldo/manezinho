@@ -8,7 +8,6 @@ import (
 
 	"github.com/go-telegram/bot"
 	"github.com/vcaldo/manezinho/bot/transmission"
-	"github.com/vcaldo/manezinho/bot/utils/fileutils"
 )
 
 type Download struct {
@@ -38,7 +37,7 @@ func MonitorDownloads(ctx context.Context, completed chan<- Download) error {
 func CompressDownload(ctx context.Context, download Download) error {
 	log.Printf("Compressing download: %v\n", download)
 	destination := fmt.Sprintf("/downloads/upload/%s/%s", download.Name, download.Name)
-	err := fileutils.CompressAndSplitDownload(ctx, download.Path, destination)
+	err := CompressAndSplitDownload(ctx, download.Path, destination)
 	if err != nil {
 		log.Printf("error compressing download: %v", err)
 		return err
@@ -93,6 +92,21 @@ func UploadWorker(ctx context.Context, b *bot.Bot, upload <-chan Download, wg *s
 			}
 
 			log.Printf("Successfully uploaded: %s", download.UploadPath)
+
+			// Remove uploaded files
+			err = RemoveUploadedFiles(ctx, download)
+			if err != nil {
+				log.Printf("error removing uploaded files: %v", err)
+			}
+
+			// Remove torrent
+			c, err := transmission.NewTransmissionClient(ctx)
+			if err != nil {
+				log.Printf("error creating transmission client: %v", err)
+				return
+			}
+
+			err = c.RemoveTorrents(ctx, []int64{download.ID})
 		}
 	}
 }
