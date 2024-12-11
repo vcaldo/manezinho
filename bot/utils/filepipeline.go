@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"path/filepath"
 	"sync"
 
 	"github.com/go-telegram/bot"
@@ -12,7 +13,7 @@ import (
 
 const (
 	ComplatedDownloadsPath = "/downloads/complete"
-	UploadsPath            = "/downloads/uploads"
+	UploadsReadyPath       = "/downloads/uploads"
 )
 
 type Download struct {
@@ -34,7 +35,7 @@ func MonitorDownloads(ctx context.Context, completed chan<- Download) error {
 		return err
 	}
 	for _, download := range completedDownloads {
-		completed <- Download{ID: *download.ID, Name: *download.Name, Path: fmt.Sprintf("%s/%s", ComplatedDownloadsPath, *download.Name), UploadPath: fmt.Sprintf("%s/%s", UploadsPath, *download.Name)}
+		completed <- Download{ID: *download.ID, Name: *download.Name, Path: filepath.Join(ComplatedDownloadsPath, *download.Name), UploadPath: filepath.Join(UploadsReadyPath, *download.Name)}
 	}
 	return nil
 }
