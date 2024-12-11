@@ -91,7 +91,7 @@ func UploadWorker(ctx context.Context, b *bot.Bot, upload <-chan Download, wg *s
 			}
 
 			// Process upload here
-			err := UploaFile(ctx, b, download)
+			err := UploadDir(ctx, b, download)
 			if err != nil {
 				log.Printf("error uploading %s: %v", download.UploadPath, err)
 			}
@@ -105,15 +105,15 @@ func UploadWorker(ctx context.Context, b *bot.Bot, upload <-chan Download, wg *s
 			}
 
 			// Remove torrent
-			c, err := transmission.NewTransmissionClient(ctx)
-			if err != nil {
-				log.Printf("error creating transmission client: %v", err)
-			}
+			// c, err := transmission.NewTransmissionClient(ctx)
+			// if err != nil {
+			// 	log.Printf("error creating transmission client: %v", err)
+			// }
 
-			err = c.RemoveTorrents(ctx, []int64{download.ID})
-			if err != nil {
-				log.Printf("error removing torrent: %v", err)
-			}
+			// err = c.RemoveTorrents(ctx, []int64{download.ID})
+			// if err != nil {
+			// 	log.Printf("error removing torrent: %v", err)
+			// }
 		}
 	}
 }
