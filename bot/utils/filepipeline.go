@@ -2,7 +2,6 @@ package utils
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"path/filepath"
 	"sync"
@@ -42,7 +41,7 @@ func MonitorDownloads(ctx context.Context, completed chan<- Download) error {
 
 func CompressDownload(ctx context.Context, download Download) error {
 	log.Printf("Compressing download: %v\n", download)
-	destination := fmt.Sprintf("%s/%s/%s", UploadsPath, download.Name, download.Name)
+	destination := filepath.Join(UploadsReadyPath, download.Name, download.Name)
 	err := CompressAndSplitDownload(ctx, download.Path, destination)
 	if err != nil {
 		log.Printf("error compressing download: %v", err)

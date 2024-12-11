@@ -27,7 +27,7 @@ func UploadDir(ctx context.Context, b *bot.Bot, download Download) error {
 			defer file.Close()
 
 			log.Printf("Uploading file: %s\n", file.Name())
-			err = uploadFile(ctx, b, file, file.Name())
+			err = uploadFile(ctx, b, file)
 			if err != nil {
 				return fmt.Errorf("failed to upload file: %v", err)
 			}
@@ -36,7 +36,7 @@ func UploadDir(ctx context.Context, b *bot.Bot, download Download) error {
 	return nil
 }
 
-func uploadFile(ctx context.Context, b *bot.Bot, file *os.File, fileName string) error {
+func uploadFile(ctx context.Context, b *bot.Bot, file *os.File) error {
 	chatId, ok := os.LookupEnv("CHAT_ID")
 	if !ok {
 		panic("CHAT_ID env var is required")
@@ -48,7 +48,7 @@ func uploadFile(ctx context.Context, b *bot.Bot, file *os.File, fileName string)
 	}
 
 	// Send the document
-	filePath := filepath.Join(UploadsPath, file.Name())
+	filePath := filepath.Join(UploadsReadyPath, file.Name())
 	fileHandle, err := os.Open(filePath)
 	if err != nil {
 		return fmt.Errorf("failed to open file: %v", err)
