@@ -10,9 +10,10 @@ import (
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
+	"github.com/vcaldo/manezinho/bot/redisutils"
 )
 
-func UploadDir(ctx context.Context, b *bot.Bot, download Download) error {
+func UploadDir(ctx context.Context, b *bot.Bot, download redisutils.Download) error {
 	chatId, ok := os.LookupEnv("CHAT_ID")
 	if !ok {
 		panic("CHAT_ID env var is required")

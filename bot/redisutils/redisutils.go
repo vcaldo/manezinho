@@ -8,10 +8,18 @@ import (
 	"strconv"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/vcaldo/manezinho/bot/utils"
 )
 
-const RedisDownloadsKey = "completed_downloads"
+const (
+	RedisDownloadsKey = "completed_downloads"
+)
+
+type Download struct {
+	ID         int64
+	Name       string
+	Path       string
+	UploadPath string
+}
 
 func NewRedisClient(ctx context.Context, addr, password string, db int) (*redis.Client, error) {
 	rdb := redis.NewClient(&redis.Options{
@@ -28,7 +36,7 @@ func NewRedisClient(ctx context.Context, addr, password string, db int) (*redis.
 
 func NewAuthenticatedRedisClient(ctx context.Context) (*redis.Client, error) {
 	addr := os.Getenv("REDIS_ADDR")
-	password := os.Getenv("REDIS_PASSWORD")
+	password := ""
 	db := 0
 	return NewRedisClient(ctx, addr, password, db)
 }
@@ -41,7 +49,7 @@ func DownloadExistsInRedis(ctx context.Context, rdb *redis.Client, id int64) (bo
 	return val, nil
 }
 
-func StoreDownloadInRedis(ctx context.Context, rdb *redis.Client, d utils.Download) error {
+func StoreDownloadInRedis(ctx context.Context, rdb *redis.Client, d Download) error {
 	data, err := json.Marshal(d)
 	if err != nil {
 		return fmt.Errorf("json marshal failed: %w", err)

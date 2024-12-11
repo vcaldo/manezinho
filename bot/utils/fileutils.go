@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/vcaldo/manezinho/bot/redisutils"
 )
 
 func CompressAndSplitDownload(ctx context.Context, source, destination string) error {
@@ -33,7 +35,7 @@ func CompressAndSplitDownload(ctx context.Context, source, destination string) e
 	return nil
 }
 
-func RemoveUploadedFiles(ctx context.Context, download Download) error {
+func RemoveUploadedFiles(ctx context.Context, download redisutils.Download) error {
 	if err := os.RemoveAll(download.UploadPath); err != nil {
 		return fmt.Errorf("failed to remove uploaded files: %v", err)
 	}

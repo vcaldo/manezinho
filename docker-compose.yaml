@@ -43,6 +43,8 @@ services:
     container_name: redis
     volumes:
       - redis-data:/data
+    ports:
+      - 6379:6379
     restart: unless-stopped
   bot:
     image: manezinho-bot:latest
@@ -53,7 +55,7 @@ services:
     environment:
       - LOCAL_TELEGRAM_BOT_API_URL=http://telegram-bot-api-server:8081
       - TRANSMISSION_URL=transmission
-      - REDIS_ADDRR=redis:6379
+      - REDIS_ADDR=redis:6379
     env_file:
       - bot.env
     volumes:
@@ -62,6 +64,7 @@ services:
     depends_on:
       - telegram-bot-api-server
       - transmission
+      - redis
     restart: unless-stopped
 volumes:
   redis-data:

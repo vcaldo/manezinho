@@ -10,6 +10,7 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"github.com/vcaldo/manezinho/bot/handlers"
+	"github.com/vcaldo/manezinho/bot/redisutils"
 	"github.com/vcaldo/manezinho/bot/utils"
 )
 
@@ -37,9 +38,9 @@ func main() {
 		b.Start(ctx)
 	}()
 
-	completed := make(chan utils.Download)
-	compress := make(chan utils.Download)
-	upload := make(chan utils.Download)
+	completed := make(chan redisutils.Download)
+	compress := make(chan redisutils.Download)
+	upload := make(chan redisutils.Download)
 
 	var wg sync.WaitGroup
 

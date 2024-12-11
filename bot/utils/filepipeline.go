@@ -16,14 +16,7 @@ const (
 	UploadsReadyPath       = "/downloads/uploads"
 )
 
-type Download struct {
-	ID         int64
-	Name       string
-	Path       string
-	UploadPath string
-}
-
-func MonitorDownloads(ctx context.Context, completed chan<- Download) error {
+func MonitorDownloads(ctx context.Context, completed chan<- redisutils.Download) error {
 	c, err := transmission.NewTransmissionClient(ctx)
 	if err != nil {
 		log.Printf("error creating transmission client: %v", err)
@@ -42,7 +35,7 @@ func MonitorDownloads(ctx context.Context, completed chan<- Download) error {
 	defer rdb.Close()
 
 	for _, download := range completedDownloads {
-		d := Download{
+		d := redisutils.Download{
 			ID:         *download.ID,
 			Name:       *download.Name,
 			Path:       filepath.Join(ComplatedDownloadsPath, *download.Name),
@@ -68,7 +61,7 @@ func MonitorDownloads(ctx context.Context, completed chan<- Download) error {
 	return nil
 }
 
-func CompressDownload(ctx context.Context, download Download) error {
+func CompressDownload(ctx context.Context, download redisutils.Download) error {
 	log.Printf("Compressing download: %v\n", download)
 	destination := filepath.Join(UploadsReadyPath, download.Name, download.Name)
 	err := CompressAndSplitDownload(ctx, download.Path, destination)
@@ -81,7 +74,7 @@ func CompressDownload(ctx context.Context, download Download) error {
 }
 
 // CompressionWorker to forward to upload channel
-func CompressionWorker(ctx context.Context, compress <-chan Download, upload chan<- Download, wg *sync.WaitGroup) {
+func CompressionWorker(ctx context.Context, compress <-chan redisutils.Download, upload chan<- redisutils.Download, wg *sync.WaitGroup) {
 	defer wg.Done()
 	defer close(upload)
 
@@ -107,7 +100,7 @@ func CompressionWorker(ctx context.Context, compress <-chan Download, upload cha
 	}
 }
 
-func UploadWorker(ctx context.Context, b *bot.Bot, upload <-chan Download, wg *sync.WaitGroup) {
+func UploadWorker(ctx context.Context, b *bot.Bot, upload <-chan redisutils.Download, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	for {
