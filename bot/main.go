@@ -29,7 +29,6 @@ func main() {
 
 	b, err := bot.New(token, opts...)
 	if err != nil {
-
 		panic(err.Error())
 	}
 
@@ -51,7 +50,7 @@ func main() {
 
 	// Start monitoring downloads
 	go utils.MonitorDownloads(ctx, completed)
-	ticker := time.NewTicker(10 * time.Second)
+	ticker := time.NewTicker(300 * time.Second)
 	defer ticker.Stop()
 	go func() {
 		for {

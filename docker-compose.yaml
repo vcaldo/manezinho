@@ -10,7 +10,12 @@ services:
     volumes:
       - telegram-bot-api-server-storage:/storage
     restart: unless-stopped
-    entrypoint: [telegram-bot-api, "--local", "--dir=/storage","--verbosity=1"]
+    entrypoint: [
+      "telegram-bot-api",
+      "--local",
+      "--dir=/storage",
+      "--verbosity=1"
+      ]
   transmission:
     image: lscr.io/linuxserver/transmission:4.0.6
     container_name: transmission
@@ -35,11 +40,11 @@ services:
     restart: unless-stopped
   bot:
     image: manezinho-bot:latest
-    deploy:
-      resources:
-        limits:
-          cpus: '3'
-          memory: 1024M
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '3'
+    #       memory: 2048M
     container_name: manezinho-bot
     build:
       context: bot/

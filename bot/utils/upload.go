@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -40,6 +41,7 @@ func UploaFile(ctx context.Context, b *bot.Bot, download Download) error {
 				Data:     file,
 			}
 
+			log.Printf("Uploading file: %s\n", file.Name())
 			_, err = b.SendDocument(context.Background(), &bot.SendDocumentParams{
 				ChatID:   chatIdInt,
 				Document: fileReader,
