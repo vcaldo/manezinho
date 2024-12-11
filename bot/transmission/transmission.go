@@ -69,3 +69,14 @@ func (c *Client) GetCompletedDownloads(ctx context.Context) ([]*transmissionrpc.
 	}
 	return completed, nil
 }
+
+func (c *Client) RemoveTorrents(ctx context.Context, id []int64) error {
+	err := c.client.TorrentRemove(&transmissionrpc.TorrentRemovePayload{
+		IDs:             id,
+		DeleteLocalData: true,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}

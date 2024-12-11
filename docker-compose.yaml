@@ -51,23 +51,6 @@ services:
       - telegram-bot-api-server
       - transmission
     restart: unless-stopped
-  redis:
-    image: redis:7.4.1
-    container_name: redis
-    ports:
-      - 6379:6379
-    volumes:
-      - redis-data:/data
-    restart: unless-stopped
-  metrics:
-    image: metrics:latest
-    container_name: metrics
-    build:
-      context: metrics/
-      dockerfile: Dockerfile
-    environment:
-      - REDIS_HOST=redis
-      - TRANSMISSION_URL=transmission
 volumes:
   redis-data:
   telegram-bot-api-server-storage:
