@@ -46,7 +46,7 @@ func UploadDir(ctx context.Context, b *bot.Bot, download Download) error {
 
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: chatIdInt,
-		Text:   fmt.Sprintf("%s - %v", download.Name, download.Size),
+		Text:   download.Name,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to send message: %v", err)
