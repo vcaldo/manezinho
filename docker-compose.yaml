@@ -35,6 +35,11 @@ services:
     restart: unless-stopped
   bot:
     image: manezinho-bot:latest
+    deploy:
+      resources:
+        limits:
+          cpus: '3'
+          memory: 1024M
     container_name: manezinho-bot
     build:
       context: bot/
