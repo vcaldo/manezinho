@@ -51,6 +51,7 @@ func MonitorDownloads(ctx context.Context, completed chan<- redisutils.Download)
 
 		// Store in Redis and push to channel if new
 		if !exists {
+			log.Printf("New download completed: %s", d.Name)
 			if err := redisutils.StoreDownloadInRedis(ctx, rdb, d); err != nil {
 				log.Printf("error storing in redis: %v", err)
 				continue
