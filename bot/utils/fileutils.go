@@ -17,7 +17,7 @@ func CompressAndSplitDownload(ctx context.Context, source, destination string) e
 	// Prepare 7za command with volume size parameter
 	cmd := exec.Command("7zz",
 		"a",                               // add to archive
-		"-v2000m",                         // split into 2gb volumes
+		"-v2m",                            // split into 2gb volumes
 		"-t7z",                            // use 7z format
 		fmt.Sprintf("%s.7z", destination), // output file
 		source,                            // input file/directory

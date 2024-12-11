@@ -20,7 +20,7 @@ func UploadDir(ctx context.Context, b *bot.Bot, download Download) error {
 
 	for _, file := range files {
 		if !file.IsDir() {
-			file, err := os.Open(file.Name())
+			file, err := os.Open(filepath.Join(download.UploadPath, file.Name()))
 			if err != nil {
 				return fmt.Errorf("failed to open file: %v", err)
 			}
