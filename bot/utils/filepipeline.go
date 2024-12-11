@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/go-telegram/bot"
+	"github.com/hekmon/cunits/v2"
 	"github.com/vcaldo/manezinho/bot/transmission"
 )
 
@@ -18,6 +19,7 @@ const (
 type Download struct {
 	ID         int64
 	Name       string
+	Size       *cunits.Bits
 	Path       string
 	UploadPath string
 }
@@ -34,7 +36,11 @@ func MonitorDownloads(ctx context.Context, completed chan<- Download) error {
 		return err
 	}
 	for _, download := range completedDownloads {
-		completed <- Download{ID: *download.ID, Name: *download.Name, Path: filepath.Join(ComplatedDownloadsPath, *download.Name), UploadPath: filepath.Join(UploadsReadyPath, *download.Name)}
+		completed <- Download{ID: *download.ID,
+			Name:       *download.Name,
+			Size:       download.SizeWhenDone,
+			Path:       filepath.Join(ComplatedDownloadsPath, *download.Name),
+			UploadPath: filepath.Join(UploadsReadyPath, *download.Name)}
 	}
 	return nil
 }

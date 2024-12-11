@@ -13,6 +13,16 @@ import (
 )
 
 func UploadDir(ctx context.Context, b *bot.Bot, download Download) error {
+	chatId, ok := os.LookupEnv("CHAT_ID")
+	if !ok {
+		panic("CHAT_ID env var is required")
+	}
+
+	chatIdInt, err := strconv.ParseInt(chatId, 10, 64)
+	if err != nil {
+		panic("CHAT_ID must be a valid int64")
+	}
+
 	files, err := os.ReadDir(download.UploadPath)
 	if err != nil {
 		return fmt.Errorf("failed to read directory: %v", err)
@@ -33,6 +43,14 @@ func UploadDir(ctx context.Context, b *bot.Bot, download Download) error {
 			}
 		}
 	}
+	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID: chatIdInt,
+		Text:   fmt.Sprintf("%s - %s", download.Name, download.Size.String()),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to send message: %v", err)
+	}
+
 	return nil
 }
 
