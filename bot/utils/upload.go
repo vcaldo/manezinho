@@ -44,10 +44,9 @@ func UploadDir(ctx context.Context, b *bot.Bot, download Download) error {
 		}
 	}
 
-	humanSize := download.Size.String()
 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: chatIdInt,
-		Text:   fmt.Sprintf("%s - %s", download.Name, humanSize),
+		Text:   fmt.Sprintf("%s - %v", download.Name, download.Size),
 	})
 	if err != nil {
 		return fmt.Errorf("failed to send message: %v", err)
