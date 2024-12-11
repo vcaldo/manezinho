@@ -14,7 +14,7 @@ type Client struct {
 
 func NewClient(ctx context.Context, address, username, password string) (*Client, error) {
 	client, err := transmissionrpc.New(address, username, password, &transmissionrpc.AdvancedConfig{
-		HTTPTimeout: 10 * time.Second,
+		HTTPTimeout: 60 * time.Second,
 	})
 	if err != nil {
 		return nil, err
