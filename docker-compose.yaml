@@ -38,13 +38,14 @@ services:
       - transmission-downloads:/downloads
       - transmission-watch:/watch
     restart: unless-stopped
+  redis:
+    image: redis:latest
+    container_name: redis
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
   bot:
     image: manezinho-bot:latest
-    # deploy:
-    #   resources:
-    #     limits:
-    #       cpus: '3'
-    #       memory: 2048M
     container_name: manezinho-bot
     build:
       context: bot/
@@ -52,6 +53,7 @@ services:
     environment:
       - LOCAL_TELEGRAM_BOT_API_URL=http://telegram-bot-api-server:8081
       - TRANSMISSION_URL=transmission
+      - REDIS_ADDRR=redis:6379
     env_file:
       - bot.env
     volumes:

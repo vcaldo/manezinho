@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/go-telegram/bot"
-	"github.com/hekmon/cunits/v2"
+	"github.com/vcaldo/manezinho/bot/redisutils"
 	"github.com/vcaldo/manezinho/bot/transmission"
 )
 
@@ -19,7 +19,6 @@ const (
 type Download struct {
 	ID         int64
 	Name       string
-	Size       *cunits.Bits
 	Path       string
 	UploadPath string
 }
@@ -35,12 +34,36 @@ func MonitorDownloads(ctx context.Context, completed chan<- Download) error {
 		log.Printf("error getting completed downloads: %v", err)
 		return err
 	}
+
+	rdb, err := redisutils.NewAuthenticatedRedisClient(ctx)
+	if err != nil {
+		log.Printf("error creating redis client: %v", err)
+	}
+	defer rdb.Close()
+
 	for _, download := range completedDownloads {
-		completed <- Download{ID: *download.ID,
+		d := Download{
+			ID:         *download.ID,
 			Name:       *download.Name,
-			Size:       download.TotalSize,
 			Path:       filepath.Join(ComplatedDownloadsPath, *download.Name),
-			UploadPath: filepath.Join(UploadsReadyPath, *download.Name)}
+			UploadPath: filepath.Join(UploadsReadyPath, *download.Name),
+		}
+
+		// Check if download exists in Redis
+		exists, err := redisutils.DownloadExistsInRedis(ctx, rdb, d.ID)
+		if err != nil {
+			log.Printf("error checking redis: %v", err)
+			continue
+		}
+
+		// Store in Redis and push to channel if new
+		if !exists {
+			if err := redisutils.StoreDownloadInRedis(ctx, rdb, d); err != nil {
+				log.Printf("error storing in redis: %v", err)
+				continue
+			}
+			completed <- d
+		}
 	}
 	return nil
 }
