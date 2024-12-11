@@ -10,6 +10,11 @@ import (
 	"github.com/vcaldo/manezinho/bot/transmission"
 )
 
+const (
+	ComplatedDownloadsPath = "/downloads/complete"
+	UploadsPath            = "/downloads/uploads"
+)
+
 type Download struct {
 	ID         int64
 	Name       string
@@ -29,14 +34,14 @@ func MonitorDownloads(ctx context.Context, completed chan<- Download) error {
 		return err
 	}
 	for _, download := range completedDownloads {
-		completed <- Download{ID: *download.ID, Name: *download.Name, Path: fmt.Sprintf("/downloads/complete/%s", *download.Name), UploadPath: fmt.Sprintf("/downloads/upload/%s", *download.Name)}
+		completed <- Download{ID: *download.ID, Name: *download.Name, Path: fmt.Sprintf("%s/%s", ComplatedDownloadsPath, *download.Name), UploadPath: fmt.Sprintf("%s/%s", UploadsPath, *download.Name)}
 	}
 	return nil
 }
 
 func CompressDownload(ctx context.Context, download Download) error {
 	log.Printf("Compressing download: %v\n", download)
-	destination := fmt.Sprintf("/downloads/upload/%s/%s", download.Name, download.Name)
+	destination := fmt.Sprintf("%s/%s/%s", UploadsPath, download.Name, download.Name)
 	err := CompressAndSplitDownload(ctx, download.Path, destination)
 	if err != nil {
 		log.Printf("error compressing download: %v", err)
@@ -103,10 +108,12 @@ func UploadWorker(ctx context.Context, b *bot.Bot, upload <-chan Download, wg *s
 			c, err := transmission.NewTransmissionClient(ctx)
 			if err != nil {
 				log.Printf("error creating transmission client: %v", err)
-				return
 			}
 
 			err = c.RemoveTorrents(ctx, []int64{download.ID})
+			if err != nil {
+				log.Printf("error removing torrent: %v", err)
+			}
 		}
 	}
 }

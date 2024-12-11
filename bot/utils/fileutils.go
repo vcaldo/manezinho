@@ -30,7 +30,6 @@ func CompressAndSplitDownload(ctx context.Context, source, destination string) e
 	}
 
 	fmt.Printf("Compression completed: %s\n", output)
-
 	return nil
 }
 

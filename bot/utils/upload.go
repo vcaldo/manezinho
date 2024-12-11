@@ -49,5 +49,12 @@ func UploaFile(ctx context.Context, b *bot.Bot, download Download) error {
 			}
 		}
 	}
+	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID: chatIdInt,
+		Text:   download.Name,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to send message: %v", err)
+	}
 	return nil
 }
