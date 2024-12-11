@@ -38,7 +38,7 @@ func MonitorDownloads(ctx context.Context, completed chan<- Download) error {
 	for _, download := range completedDownloads {
 		completed <- Download{ID: *download.ID,
 			Name:       *download.Name,
-			Size:       download.SizeWhenDone,
+			Size:       download.TotalSize,
 			Path:       filepath.Join(ComplatedDownloadsPath, *download.Name),
 			UploadPath: filepath.Join(UploadsReadyPath, *download.Name)}
 	}
