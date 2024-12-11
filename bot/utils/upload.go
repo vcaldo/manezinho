@@ -47,16 +47,9 @@ func uploadFile(ctx context.Context, b *bot.Bot, file *os.File) error {
 		panic("CHAT_ID must be a valid int64")
 	}
 
-	// Send the document
-	filePath := filepath.Join(UploadsReadyPath, file.Name())
-	fileHandle, err := os.Open(filePath)
-	if err != nil {
-		return fmt.Errorf("failed to open file: %v", err)
-	}
-
 	fileReader := &models.InputFileUpload{
 		Filename: file.Name(),
-		Data:     fileHandle,
+		Data:     file,
 	}
 
 	_, err = b.SendDocument(ctx, &bot.SendDocumentParams{
