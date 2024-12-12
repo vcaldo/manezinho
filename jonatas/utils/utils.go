@@ -32,9 +32,9 @@ func GetCompletedDownloads(ctx context.Context, downloadChan chan<- redisutils.D
 		d := redisutils.Download{
 			ID:         *download.ID,
 			Name:       *download.Name,
-			Path:       filepath.Join(ComplatedDownloadsPath, *download.Name),
-			UploadPath: filepath.Join(UploadsReadyPath, *download.Name),
-			State:      Downloaded,
+			Path:       filepath.Join(redisutils.ComplatedDownloadsPath, *download.Name),
+			UploadPath: filepath.Join(redisutils.UploadsReadyPath, *download.Name),
+			State:      redisutils.Downloaded,
 		}
 		// Check if download exists in Redis
 		exists, err := redisutils.DownloadExistsInRedis(ctx, rdb, d.ID)
@@ -67,7 +67,7 @@ func ProcessDownload(ctx context.Context, download redisutils.Download) {
 	defer rdb.Close()
 
 	// Update a state to compressing in Redis
-	download.State = Compressing
+	download.State = redisutils.Compressing
 	err = redisutils.RegisterDownloadState(ctx, rdb, download)
 	if err != nil {
 		log.Printf("error updating download state in redis: %v", err)
@@ -82,7 +82,7 @@ func ProcessDownload(ctx context.Context, download redisutils.Download) {
 	}
 
 	// Update a state to compressed in Redis
-	download.State = Compressed
+	download.State = redisutils.Compressed
 	err = redisutils.RegisterDownloadState(ctx, rdb, download)
 	if err != nil {
 		log.Printf("error updating download state in redis: %v", err)
@@ -94,7 +94,7 @@ func ProcessDownload(ctx context.Context, download redisutils.Download) {
 
 func CompressDownload(ctx context.Context, download redisutils.Download) error {
 	log.Printf("Compressing download: %s", download.Name)
-	destination := filepath.Join(UploadsReadyPath, download.Name, download.Name)
+	destination := filepath.Join(redisutils.UploadsReadyPath, download.Name, download.Name)
 	err := CompressAndSplitDownload(ctx, download.Path, destination)
 	if err != nil {
 		log.Printf("error compressing download: %v", err)

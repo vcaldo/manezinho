@@ -1,4 +1,4 @@
-package utils
+package redisutils
 
 const (
 	Downloaded             = "downloaded"
@@ -7,6 +7,8 @@ const (
 	Uploading              = "uploading"
 	Uploaded               = "uploaded"
 	Removed                = "removed"
+	NameKey                = "name"
+	StateKey               = "state"
 	ComplatedDownloadsPath = "/downloads/complete"
 	UploadsReadyPath       = "/downloads/uploads"
 )

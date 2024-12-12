@@ -80,3 +80,11 @@ func (c *Client) RemoveTorrents(ctx context.Context, id []int64) error {
 	}
 	return nil
 }
+
+func (c *Client) GetTorrentInfo(ctx context.Context, id int64) (*transmissionrpc.Torrent, error) {
+	torrent, err := c.client.TorrentGet([]string{"id", "name", "totalSize"}, []int64{id})
+	if err != nil {
+		return nil, err
+	}
+	return torrent[0], nil
+}
