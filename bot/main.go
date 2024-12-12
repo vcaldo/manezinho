@@ -76,9 +76,10 @@ func main() {
 func handler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	// Check if the user is allowed
 	if !utils.IsUserAllowed(ctx, update.Message.From.ID) {
-		b.SendMessage(ctx, &bot.SendMessageParams{
-			ChatID: update.Message.Chat.ID,
-			Text:   "You are not allowed to use this bot",
+		b.SendPhoto(ctx, &bot.SendPhotoParams{
+			ChatID:  update.Message.Chat.ID,
+			Photo:   &models.InputFileString{Data: "https://ih1.redbubble.net/image.3655810608.7816/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"},
+			Caption: "You are not allowed to use this bot. This incident will be reported.",
 		})
 		return
 	}
