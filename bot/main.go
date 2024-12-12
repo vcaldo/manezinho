@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"sync"
@@ -79,7 +80,7 @@ func handler(ctx context.Context, b *bot.Bot, update *models.Update) {
 		b.SendPhoto(ctx, &bot.SendPhotoParams{
 			ChatID:  update.Message.Chat.ID,
 			Photo:   &models.InputFileString{Data: "https://ih1.redbubble.net/image.3655810608.7816/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"},
-			Caption: "You are not allowed to use this bot. This incident will be reported.",
+			Caption: fmt.Sprintf("You are not allowed to use this bot. This incident will be reported. User ID: %d", update.Message.From.ID),
 		})
 		return
 	}
