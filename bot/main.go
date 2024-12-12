@@ -5,13 +5,10 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"time"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"github.com/vcaldo/manezinho/bot/handlers"
-	"github.com/vcaldo/manezinho/bot/redisutils"
-	"github.com/vcaldo/manezinho/bot/utils"
 )
 
 func main() {
@@ -38,32 +35,7 @@ func main() {
 		b.Start(ctx)
 	}()
 
-	downloadChan := make(chan redisutils.Download)
-
-	// Goroutine to constantly check for completed downloads
-	ticker := time.NewTicker(10 * time.Second)
-	defer ticker.Stop()
-	go func() {
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-ticker.C:
-				utils.GetCompletedDownloads(ctx, downloadChan)
-			}
-		}
-	}()
-
-	// Goroutine to process downloads one at a time
-	go func() {
-		for download := range downloadChan {
-			utils.ProcessDownload(ctx, b, download)
-		}
-	}()
-
-	// Keep the main function running
 	select {}
-
 }
 
 func handler(ctx context.Context, b *bot.Bot, update *models.Update) {

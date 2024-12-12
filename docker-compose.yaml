@@ -66,6 +66,22 @@ services:
       - transmission
       - redis
     restart: unless-stopped
+  jonatas:
+    image: jonatas:latest
+    container_name: jonatas
+    build:
+      context: jonatas/
+      dockerfile: Dockerfile
+    environment:
+      - TRANSMISSION_URL=transmission
+      - REDIS_ADDR=redis:6379
+    volumes:
+      - transmission-downloads:/downloads
+    depends_on:
+      - telegram-bot-api-server
+      - transmission
+      - redis
+    restart: unless-stopped
 volumes:
   redis-data:
   telegram-bot-api-server-storage:

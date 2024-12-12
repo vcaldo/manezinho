@@ -7,10 +7,11 @@ RUN go mod download
 COPY . .
 COPY *.go ./
 
-RUN CGO_ENABLED=0 go build -o /manezinho_bot .
+RUN CGO_ENABLED=0 go build -o /jonatas .
 
 FROM alpine:3.21
 
-COPY --from=builder /manezinho_bot /manezinho_bot
+RUN apk add --no-cache p7zip
+COPY --from=builder /jonatas /jonatas
 
-CMD ["/manezinho_bot"]
+CMD ["/jonatas"]
