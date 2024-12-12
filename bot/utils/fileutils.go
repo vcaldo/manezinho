@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/vcaldo/manezinho/bot/redisutils"
+	"github.com/vcaldo/manezinho/jonatas/redisutils"
 )
 
 func CompressAndSplitDownload(ctx context.Context, source, destination string) error {

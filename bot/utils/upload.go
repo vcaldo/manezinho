@@ -11,7 +11,7 @@ import (
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
-	"github.com/vcaldo/manezinho/bot/redisutils"
+	"github.com/vcaldo/manezinho/jonatas/redisutils"
 )
 
 func UploadDir(ctx context.Context, b *bot.Bot, download redisutils.Download) error {

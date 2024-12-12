@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 
 	"github.com/go-telegram/bot"
-	"github.com/vcaldo/manezinho/bot/redisutils"
 	"github.com/vcaldo/manezinho/bot/transmission"
+	"github.com/vcaldo/manezinho/jonatas/redisutils"
 )
 
 func GetCompletedDownloads(ctx context.Context, downloadChan chan<- redisutils.Download) error {
@@ -46,7 +46,7 @@ func GetCompletedDownloads(ctx context.Context, downloadChan chan<- redisutils.D
 		// Store in Redis and push to channel if new
 		if !exists {
 			log.Printf("New download completion detected: %s", d.Name)
-			if err := redisutils.StoreDownloadInRedis(ctx, rdb, d); err != nil {
+			if err := redisutils.RegisterDownloadState(ctx, rdb, d); err != nil {
 				log.Printf("error storing in redis: %v", err)
 				continue
 			}

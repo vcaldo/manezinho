@@ -7,8 +7,8 @@ import (
 	"sync"
 
 	"github.com/go-telegram/bot"
-	"github.com/vcaldo/manezinho/bot/redisutils"
 	"github.com/vcaldo/manezinho/bot/transmission"
+	"github.com/vcaldo/manezinho/jonatas/redisutils"
 )
 
 const (
@@ -52,7 +52,7 @@ func MonitorDownloads(ctx context.Context, completed chan<- redisutils.Download)
 		// Store in Redis and push to channel if new
 		if !exists {
 			log.Printf("New download completion detected: %s", d.Name)
-			if err := redisutils.StoreDownloadInRedis(ctx, rdb, d); err != nil {
+			if err := redisutils.RegisterDownloadState(ctx, rdb, d); err != nil {
 				log.Printf("error storing in redis: %v", err)
 				continue
 			}

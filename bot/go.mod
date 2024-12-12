@@ -6,6 +6,7 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-telegram/bot v1.11.1
 	github.com/hekmon/transmissionrpc v1.1.0
+	github.com/vcaldo/manezinho/jonatas v0.0.0-20241212223319-25055e7f0ee7
 )
 
 require (

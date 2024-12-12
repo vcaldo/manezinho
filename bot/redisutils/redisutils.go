@@ -50,7 +50,7 @@ func DownloadExistsInRedis(ctx context.Context, rdb *redis.Client, id int64) (bo
 	return val, nil
 }
 
-func StoreDownloadInRedis(ctx context.Context, rdb *redis.Client, d Download) error {
+func RegisterDownloadState(ctx context.Context, rdb *redis.Client, d Download) error {
 	data, err := json.Marshal(d)
 	if err != nil {
 		return fmt.Errorf("json marshal failed: %w", err)
