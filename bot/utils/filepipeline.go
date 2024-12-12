@@ -51,7 +51,7 @@ func MonitorDownloads(ctx context.Context, completed chan<- redisutils.Download)
 
 		// Store in Redis and push to channel if new
 		if !exists {
-			log.Printf("New download completed: %s", d.Name)
+			log.Printf("New download completion detected: %s", d.Name)
 			if err := redisutils.StoreDownloadInRedis(ctx, rdb, d); err != nil {
 				log.Printf("error storing in redis: %v", err)
 				continue
@@ -63,14 +63,14 @@ func MonitorDownloads(ctx context.Context, completed chan<- redisutils.Download)
 }
 
 func CompressDownload(ctx context.Context, download redisutils.Download) error {
-	log.Printf("Compressing download: %v\n", download)
+	log.Printf("Compressing download: %s", download.Name)
 	destination := filepath.Join(UploadsReadyPath, download.Name, download.Name)
 	err := CompressAndSplitDownload(ctx, download.Path, destination)
 	if err != nil {
 		log.Printf("error compressing download: %v", err)
 		return err
 	}
-	log.Printf("Compression completed: %v\n", download)
+	log.Printf("Compression completed: %v", download)
 	return nil
 }
 

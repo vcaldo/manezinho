@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
@@ -37,11 +38,12 @@ func UploadDir(ctx context.Context, b *bot.Bot, download redisutils.Download) er
 			}
 			defer file.Close()
 
-			log.Printf("Uploading file: %s\n", file.Name())
+			log.Printf("Uploading file: %s", file.Name())
 			err = uploadFile(ctx, b, file, chatIdInt)
 			if err != nil {
 				return fmt.Errorf("failed to upload file: %v", err)
 			}
+			time.Sleep(5 * time.Second)
 		}
 	}
 

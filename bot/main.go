@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"sync"
 	"time"
 
 	"github.com/go-telegram/bot"
@@ -39,19 +38,9 @@ func main() {
 		b.Start(ctx)
 	}()
 
-	completed := make(chan redisutils.Download)
-	compress := make(chan redisutils.Download)
-	upload := make(chan redisutils.Download)
+	downloadChan := make(chan redisutils.Download)
 
-	var wg sync.WaitGroup
-
-	// Start the compression worker and upload workers
-	wg.Add(1)
-	go utils.CompressionWorker(ctx, compress, upload, &wg)
-	go utils.UploadWorker(ctx, b, upload, &wg)
-
-	// Start monitoring downloads
-	go utils.MonitorDownloads(ctx, completed)
+	// Goroutine to constantly check for completed downloads
 	ticker := time.NewTicker(10 * time.Second)
 	defer ticker.Stop()
 	go func() {
@@ -60,18 +49,21 @@ func main() {
 			case <-ctx.Done():
 				return
 			case <-ticker.C:
-				utils.MonitorDownloads(ctx, completed)
+				utils.GetCompletedDownloads(ctx, downloadChan)
 			}
 		}
 	}()
 
-	// Signal compression worker with completed downloads
-	for download := range completed {
-		compress <- download
-	}
+	// Goroutine to process downloads one at a time
+	go func() {
+		for download := range downloadChan {
+			utils.ProcessDownload(ctx, b, download)
+		}
+	}()
 
-	close(compress)
-	wg.Wait()
+	// Keep the main function running
+	select {}
+
 }
 
 func handler(ctx context.Context, b *bot.Bot, update *models.Update) {

@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -31,7 +32,7 @@ func CompressAndSplitDownload(ctx context.Context, source, destination string) e
 		return fmt.Errorf("compression failed: %v\nOutput: %s", err, output)
 	}
 
-	fmt.Printf("Compression completed: %s\n", output)
+	log.Printf("Compression completed: %s\n", output)
 	return nil
 }
 
