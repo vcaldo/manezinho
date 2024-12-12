@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 
@@ -46,6 +47,7 @@ func DownloadExistsInRedis(ctx context.Context, rdb *redis.Client, id int64) (bo
 	if err != nil {
 		return false, fmt.Errorf("redis check failed: %w", err)
 	}
+	log.Printf("Download exists in Redis: %t", val)
 	return val, nil
 }
 
@@ -55,6 +57,7 @@ func StoreDownloadInRedis(ctx context.Context, rdb *redis.Client, d Download) er
 		return fmt.Errorf("json marshal failed: %w", err)
 	}
 
+	log.Printf("Storing download in Redis: %s", d.Name)
 	err = rdb.HSet(ctx, RedisDownloadsKey, strconv.FormatInt(d.ID, 10), string(data)).Err()
 	if err != nil {
 		return fmt.Errorf("redis set failed: %w", err)
