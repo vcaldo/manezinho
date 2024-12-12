@@ -47,7 +47,6 @@ func DownloadExistsInRedis(ctx context.Context, rdb *redis.Client, id int64) (bo
 	if err != nil {
 		return false, fmt.Errorf("redis check failed: %w", err)
 	}
-	log.Printf("Download exists in Redis: %t", val)
 	return val, nil
 }
 
