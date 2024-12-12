@@ -76,14 +76,14 @@ func main() {
 
 func handler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	// Check if the user is allowed
-	if !utils.IsUserAllowed(ctx, update.Message.From.ID) {
+	if !handlers.IsUserAllowed(ctx, update.Message.From.ID) {
 		b.SendPhoto(ctx, &bot.SendPhotoParams{
 			ChatID: update.Message.Chat.ID,
 			Photo:  &models.InputFileString{Data: "https://ih1.redbubble.net/image.3655810608.7816/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"},
 			Caption: fmt.Sprintf(
 				"⚠️ Access Restricted\n\n"+
 					"This bot requires authorization for usage.\n"+
-					"To request access, please contact the administrator with your User ID:\n"+
+					"To request access, contact the administrator or the person who invited you, and provide your User ID\n"+
 					"📋 User ID: %d\n\n"+
 					"Thank you for your understanding.",
 				update.Message.From.ID,
