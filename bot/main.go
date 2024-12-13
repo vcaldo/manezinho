@@ -9,6 +9,7 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"github.com/vcaldo/manezinho/bot/handlers"
+	"github.com/vcaldo/manezinho/jonatas/redisutils"
 )
 
 func main() {
@@ -33,6 +34,29 @@ func main() {
 	// Start the bot with a goroutine
 	go func() {
 		b.Start(ctx)
+	}()
+
+	uploadChan := make(chan redisutils.Download)
+
+	// Goroutine to constantly check for completed downloads
+	ticker := time.NewTicker(10 * time.Second)
+	defer ticker.Stop()
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				utils.GetCompressedFiles(ctx, uploadChan)
+			}
+		}
+	}()
+
+	// Goroutine to process downloads one at a time
+	go func() {
+		for upload := range uploadChan {
+			utils.ProcessDownload(ctx, upload)
+		}
 	}()
 
 	select {}

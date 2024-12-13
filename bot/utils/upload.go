@@ -14,6 +14,46 @@ import (
 	"github.com/vcaldo/manezinho/jonatas/redisutils"
 )
 
+func GetCompressedFiles(ctx context.Context, uploadChan chan<- redisutils.Download) {
+	compressed, err := redisutils.GetDowloadState(ctx, rdb, redisutils.Compressed)
+	if err != nil {
+		log.Printf("failed to get downloads: %v", err)
+		return
+	}
+
+	for _, id := range compressed {
+		// Get Downlaod Name
+		name, err := redisutils.GetDownloadName(ctx, rdb, id)
+		if err != nil {
+			log.Printf("failed to get download name: %v", err)
+			continue
+		}
+
+		//get download path
+		downloadPath, err := redisutils.GetDownloadPath(ctx, rdb, id)
+		if err != nil {
+			log.Printf("failed to get download path: %v", err)
+			continue
+		}
+
+		// Get upload path
+		uploadPath, err := redisutils.GetUploadPath(ctx, rdb, id)
+		if err != nil {
+			log.Printf("failed to get upload path: %v", err)
+			continue
+		}
+
+		upload := redisutils.Download{
+			ID:         id,
+			Name:       downloadPath,
+			UploadPath: uploadPath,
+			Path:       downloadPath,
+		}
+
+		uploadChan <- upload
+	}
+}
+
 func UploadDir(ctx context.Context, b *bot.Bot, download redisutils.Download) error {
 	chatId, ok := os.LookupEnv("CHAT_ID")
 	if !ok {
