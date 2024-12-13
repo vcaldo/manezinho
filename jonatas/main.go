@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/vcaldo/manezinho/jonatas/fileutils"
 	"github.com/vcaldo/manezinho/jonatas/redisutils"
-	"github.com/vcaldo/manezinho/jonatas/utils"
 )
 
 func main() {
@@ -21,7 +21,7 @@ func main() {
 			case <-ctx.Done():
 				return
 			case <-ticker.C:
-				utils.GetCompletedDownloads(ctx, downloadChan)
+				fileutils.GetCompletedDownloads(ctx, downloadChan)
 			}
 		}
 	}()
@@ -29,7 +29,7 @@ func main() {
 	// Goroutine to process downloads one at a time
 	go func() {
 		for download := range downloadChan {
-			utils.ProcessDownload(ctx, download)
+			fileutils.ProcessDownload(ctx, download)
 		}
 	}()
 
