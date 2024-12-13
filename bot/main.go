@@ -10,6 +10,7 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 	"github.com/vcaldo/manezinho/bot/handlers"
+	"github.com/vcaldo/manezinho/bot/utils"
 	"github.com/vcaldo/manezinho/jonatas/redisutils"
 )
 
