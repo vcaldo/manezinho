@@ -3,8 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/go-telegram/bot"
@@ -56,8 +59,49 @@ func main() {
 
 	// Goroutine to process downloads one at a time
 	go func() {
+		chatId, ok := os.LookupEnv("CHAT_ID")
+		if !ok {
+			panic("CHAT_ID env var is required")
+		}
+
+		chatIdInt, err := strconv.ParseInt(chatId, 10, 64)
+		if err != nil {
+			panic("CHAT_ID must be a valid int64")
+		}
+
 		for upload := range uploadChan {
-			utils.ProcessDownload(ctx, upload)
+			files, err := os.ReadDir(upload.UploadPath)
+			if err != nil {
+				log.Printf("failed to read directory: %v", err)
+				return
+			}
+
+			for _, file := range files {
+				if !file.IsDir() {
+					file, err := os.Open(filepath.Join(upload.UploadPath, file.Name()))
+					if err != nil {
+						log.Printf("failed to open file: %v", err)
+						return
+					}
+					defer file.Close()
+
+					log.Printf("Uploading file: %s", file.Name())
+					err = utils.UploadFile(ctx, b, file, chatIdInt)
+					if err != nil {
+						log.Printf("failed to upload file: %v", err)
+						return
+					}
+
+					_, err = b.SendMessage(ctx, &bot.SendMessageParams{
+						ChatID: chatIdInt,
+						Text:   upload.Name,
+					})
+					if err != nil {
+						log.Printf("failed to send message: %v", err)
+						return
+					}
+				}
+			}
 		}
 	}()
 
