@@ -5,7 +5,7 @@ go 1.23.4
 require (
 	github.com/go-telegram/bot v1.11.1
 	github.com/hekmon/transmissionrpc v1.1.0
-	github.com/vcaldo/manezinho/jonatas v0.0.0-20241212233919-d57b65d42131
+	github.com/vcaldo/manezinho/jonatas v0.0.0-20241213000848-68ca6a636226
 )
 
 require (
