@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
@@ -38,6 +40,10 @@ func main() {
 
 	opts := []bot.Option{
 		bot.WithServerURL(os.Getenv("LOCAL_TELEGRAM_BOT_API_URL")),
+		bot.WithCheckInitTimeout(60 * time.Second),
+		bot.WithHTTPClient(60*time.Second, &http.Client{
+			Timeout: 600 * time.Second,
+		}),
 	}
 
 	b, err := bot.New(token, opts...)
