@@ -9,6 +9,11 @@ import (
 )
 
 func IsUserAllowed(ctx context.Context, userId int64) bool {
+	// Check if the user is a bot
+	if userId < 0 {
+		log.Printf("user %v is a bot and isn't allowed to use the bot", userId)
+		return false
+	}
 	// Create a slice of allowed user ids from env var
 	allowedUserIds := os.Getenv("ALLOWED_USER_IDS")
 	allowedUserIdsSlice := strings.Split(allowedUserIds, ",")

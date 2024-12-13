@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"strconv"
 	"time"
 
@@ -68,39 +67,19 @@ func main() {
 		if err != nil {
 			panic("CHAT_ID must be a valid int64")
 		}
-
 		for upload := range uploadChan {
-			files, err := os.ReadDir(upload.UploadPath)
+			err := utils.UploadDir(ctx, upload)
 			if err != nil {
-				log.Printf("failed to read directory: %v", err)
+				log.Println(err)
 				return
 			}
-
-			for _, file := range files {
-				if !file.IsDir() {
-					file, err := os.Open(filepath.Join(upload.UploadPath, file.Name()))
-					if err != nil {
-						log.Printf("failed to open file: %v", err)
-						return
-					}
-					defer file.Close()
-
-					log.Printf("Uploading file: %s", file.Name())
-					err = utils.UploadFile(ctx, b, file, chatIdInt)
-					if err != nil {
-						log.Printf("failed to upload file: %v", err)
-						return
-					}
-
-					_, err = b.SendMessage(ctx, &bot.SendMessageParams{
-						ChatID: chatIdInt,
-						Text:   upload.Name,
-					})
-					if err != nil {
-						log.Printf("failed to send message: %v", err)
-						return
-					}
-				}
+			_, err = b.SendMessage(ctx, &bot.SendMessageParams{
+				ChatID: chatIdInt,
+				Text:   upload.Name,
+			})
+			if err != nil {
+				log.Printf("failed to send message: %v", err)
+				return
 			}
 		}
 	}()

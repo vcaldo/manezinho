@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
+	"strconv"
+	"time"
 
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
@@ -57,60 +60,71 @@ func GetCompressedFiles(ctx context.Context, uploadChan chan<- redisutils.Downlo
 	}
 }
 
-// func UploadDir(ctx context.Context, b *bot.Bot, download redisutils.Download) error {
-// 	chatId, ok := os.LookupEnv("CHAT_ID")
-// 	if !ok {
-// 		panic("CHAT_ID env var is required")
-// 	}
+func UploadDir(ctx context.Context, download redisutils.Download) error {
+	files, err := os.ReadDir(download.UploadPath)
+	if err != nil {
+		return fmt.Errorf("failed to read directory: %v", err)
+	}
 
-// 	chatIdInt, err := strconv.ParseInt(chatId, 10, 64)
-// 	if err != nil {
-// 		panic("CHAT_ID must be a valid int64")
-// 	}
+	for _, file := range files {
+		if !file.IsDir() {
+			file, err := os.Open(filepath.Join(download.UploadPath, file.Name()))
+			if err != nil {
+				return fmt.Errorf("failed to open file: %v", err)
+			}
+			defer file.Close()
 
-// 	files, err := os.ReadDir(download.UploadPath)
-// 	if err != nil {
-// 		return fmt.Errorf("failed to read directory: %v", err)
-// 	}
+			log.Printf("Uploading file: %s", file.Name())
+			err = uploadFile(ctx, file)
+			if err != nil {
+				return fmt.Errorf("failed to upload file: %v", err)
+			}
+			time.Sleep(5 * time.Second)
+		}
+	}
+	return nil
+}
 
-// 	for _, file := range files {
-// 		if !file.IsDir() {
-// 			file, err := os.Open(filepath.Join(download.UploadPath, file.Name()))
-// 			if err != nil {
-// 				return fmt.Errorf("failed to open file: %v", err)
-// 			}
-// 			defer file.Close()
+func uploadFile(ctx context.Context, file *os.File) error {
+	chatId, ok := os.LookupEnv("CHAT_ID")
+	if !ok {
+		panic("CHAT_ID env var is required")
+	}
 
-// 			log.Printf("Uploading file: %s", file.Name())
-// 			err = uploadFile(ctx, b, file, chatIdInt)
-// 			if err != nil {
-// 				return fmt.Errorf("failed to upload file: %v", err)
-// 			}
-// 			time.Sleep(5 * time.Second)
-// 		}
-// 	}
+	chatIdInt, err := strconv.ParseInt(chatId, 10, 64)
+	if err != nil {
+		panic("CHAT_ID must be a valid int64")
+	}
 
-// 	_, err = b.SendMessage(ctx, &bot.SendMessageParams{
-// 		ChatID: chatIdInt,
-// 		Text:   download.Name,
-// 	})
-// 	if err != nil {
-// 		return fmt.Errorf("failed to send message: %v", err)
-// 	}
+	token, ok := os.LookupEnv("BOT_UPLOAD_TOKEN")
+	if !ok {
+		panic("BOT_TOKEN env var is required")
+	}
 
-// 	return nil
-// }
+	opts := []bot.Option{
+		bot.WithServerURL(os.Getenv("LOCAL_TELEGRAM_BOT_API_URL")),
+	}
 
-func UploadFile(ctx context.Context, b *bot.Bot, file *os.File, chatId int64) error {
+	uploadBot, err := bot.New(token, opts...)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	go func() {
+		<-ctx.Done()
+		uploadBot.Start(ctx)
+	}()
+	
 	fileReader := &models.InputFileUpload{
 		Filename: file.Name(),
 		Data:     file,
 	}
 
-	_, err := b.SendDocument(ctx, &bot.SendDocumentParams{
-		ChatID:   chatId,
+	_, err = uploadBot.SendDocument(ctx, &bot.SendDocumentParams{
+		ChatID:   chatIdInt,
 		Document: fileReader,
 	})
+
 	if err != nil {
 		return fmt.Errorf("failed to send document: %v", err)
 	}
