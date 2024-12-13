@@ -9,6 +9,8 @@ const (
 	Removed                = "removed"
 	NameKey                = "name"
 	StateKey               = "state"
+	PathKey                = "path"
+	UploadPathKey          = "upload"
 	ComplatedDownloadsPath = "/downloads/complete"
 	UploadsReadyPath       = "/downloads/uploads"
 )

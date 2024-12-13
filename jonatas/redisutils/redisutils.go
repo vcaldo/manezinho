@@ -53,7 +53,11 @@ func DownloadExistsInRedis(ctx context.Context, rdb *redis.Client, id int64) (bo
 
 func RegisterDownloadState(ctx context.Context, rdb *redis.Client, d Download) error {
 	log.Printf("Storing download in Redis: %s", d.Name)
-	err := rdb.HSet(ctx, fmt.Sprintf("%s:%d", CompletedHash, d.ID), []string{NameKey, d.Name, StateKey, d.State}).Err()
+	err := rdb.HSet(ctx, fmt.Sprintf("%s:%d", CompletedHash, d.ID), []string{
+		NameKey, d.Name,
+		StateKey, d.State,
+		PathKey, d.Path,
+		UploadPathKey, d.UploadPath}).Err()
 	if err != nil {
 		return fmt.Errorf("redis set failed: %w", err)
 	}
@@ -131,4 +135,31 @@ func GetDowloadState(ctx context.Context, rdb *redis.Client, state string) ([]in
 		ids = append(ids, id)
 	}
 	return ids, nil
+}
+
+func GetDownloadPath(ctx context.Context, rdb *redis.Client, id int64) (string, error) {
+	val, err := rdb.HGet(ctx, fmt.Sprintf("%s:%d", CompletedHash, id), PathKey).Result()
+	if err != nil {
+		return "", fmt.Errorf("redis get failed: %w", err)
+	}
+
+	return val, nil
+}
+
+func GetUploadPath(ctx context.Context, rdb *redis.Client, id int64) (string, error) {
+	val, err := rdb.HGet(ctx, fmt.Sprintf("%s:%d", CompletedHash, id), UploadPathKey).Result()
+	if err != nil {
+		return "", fmt.Errorf("redis get failed: %w", err)
+	}
+
+	return val, nil
+}
+
+func GetDownloadName(ctx context.Context, rdb *redis.Client, id int64) (string, error) {
+	val, err := rdb.HGet(ctx, fmt.Sprintf("%s:%d", CompletedHash, id), NameKey).Result()
+	if err != nil {
+		return "", fmt.Errorf("redis get failed: %w", err)
+	}
+
+	return val, nil
 }
