@@ -7,11 +7,11 @@ RUN go mod download
 COPY . .
 COPY *.go ./
 
-RUN CGO_ENABLED=0 go build -o /jonatas .
+RUN CGO_ENABLED=0 go build -o /garibaldi .
 
 FROM alpine:3.21
 
 RUN apk add --no-cache p7zip
-COPY --from=builder /jonatas /jonatas
+COPY --from=builder /garibaldi /garibaldi
 
-CMD ["/jonatas"]
+CMD ["/garibaldi"]

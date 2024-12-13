@@ -60,7 +60,6 @@ services:
       - bot.env
     volumes:
       - transmission-downloads:/downloads
-      - telegram-bot-api-server-storage:/storage
     depends_on:
       - telegram-bot-api-server
       - transmission
@@ -77,6 +76,24 @@ services:
       - REDIS_ADDR=redis:6379
     volumes:
       - transmission-downloads:/downloads
+    depends_on:
+      - telegram-bot-api-server
+      - transmission
+      - redis
+    restart: unless-stopped
+  garibaldi:
+    image: garibaldi:latest
+    container_name: garibaldi
+    build:
+      context: garibaldi/
+      dockerfile: Dockerfile
+    environment:
+      - LOCAL_TELEGRAM_BOT_API_URL=http://telegram-bot-api-server:8081
+      - REDIS_ADDR=redis:6379
+    env_file:
+      - bot.env      
+    volumes:
+     - transmission-downloads:/downloads
     depends_on:
       - telegram-bot-api-server
       - transmission
